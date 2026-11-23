@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Experimento: força magnética sobre a tira de alumínio</title>
+<link rel="stylesheet" href="style.css"></head><body><main>
+<h1>Força magnética sobre a tira de alumínio</h1>
+<p class="sub">Segure o botão para fechar o circuito, como no experimento real. Arraste a cena para girar e use a roda ou dois dedos para aproximar.</p>
+<div id="stage"><canvas id="cv" aria-label="Modelo 3D do experimento: tira de alumínio entre dois ímãs ligada a uma pilha"></canvas>
+<div id="hud"><span>Corrente</span><b id="hI">0,0 A</b><span>Força</span><b id="hF">0,0 mN</b><span>Deslocamento</span><b id="hD">0,0 mm</b><span>Temperatura</span><b id="hT">22 °C</b><span>Tempo</span><b id="hS">0,0 s</b></div></div>
+<div class="row">
+<button class="pri" id="hold">Tocar a ligação (segurar)</button>
+<button id="latch" aria-pressed="false">Manter ligado</button>
+<button id="pol">Inverter pilha</button>
+<button id="flip">Inverter ímãs</button>
+<button id="reset">Reiniciar</button></div>
+<div class="row">
+<button id="vec" aria-pressed="true">Vetores B, i, F</button>
+<button id="ann" aria-pressed="false">Anotações do modelo</button>
+<button data-v="p">Perspectiva</button><button data-v="t">De cima</button><button data-v="f">De frente</button></div>
+<div class="sl">
+<div><label for="n">Pilhas em série <b id="nO">1</b></label><input id="n" type="range" min="1" max="3" step="1" value="1"></div>
+<div><label for="b">Campo dos ímãs <b id="bO">0,20 T</b></label><input id="b" type="range" min="0.05" max="0.5" step="0.01" value="0.2"></div>
+<div><label for="ts">Velocidade do tempo <b id="tO">0,30×</b></label><input id="ts" type="range" min="0.05" max="1" step="0.05" value="0.3"></div></div>
+<p id="status" aria-live="polite"></p>
+<div class="lg"><span><i style="background:var(--B)"></i>B: campo, de N para S</span><span><i style="background:var(--I)"></i>i: corrente</span><span><i style="background:var(--F)"></i>F: força magnética</span></div>
+<p class="note">Valores estimados para uma tira de papel alumínio de uns 10 cm e ímãs com 2 cm de largura de campo. Quanto maior a corrente, mais a tira esquenta. A força segue F = B·i·L, com o sentido dado pela regra da mão direita. Soltar a ligação é parte do experimento: toques de 1 a 2 segundos.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="model.js"></script>
+<script src="app.js"></script>
+</body></html>
