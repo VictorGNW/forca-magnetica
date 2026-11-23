@@ -93,11 +93,32 @@ const S={n:1,B:.2,ts:.3,flip:false,pol:1,hold:false,latch:false,cut:false,x:0,v:
 const cRed=0xe05f59,cDk=()=>0x8a9eb6;
 function paint(){mat.wL.color.setHex(S.pol>0?cRed:cDk());mat.wR.color.setHex(S.pol>0?cDk():cRed);mat.tP.color.setHex(cRed);mat.tN.color.setHex(cDk());mat.txt.color.setHex(0xf1f5fa);plane.material.color.setHex(0x223149)}
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paint);paint();
-function phys(dt){const on=(S.hold||S.latch)&&!S.cut,Rs=.28*(1+.0039*(S.T-20)),r=.15*S.n+.12;S.I=on?1.5*S.n/(Rs+r):0;S.F=S.B*S.I*.02*S.pol*(S.flip?-1:1);let h=dt*S.ts;S.t+=h;
- while(h>0){const e=Math.min(.0004,h);h-=e;S.v+=(S.F-1.5*S.x-.00588*S.v)/4e-4*e;S.x+=S.v*e;if(S.x<-.0093){S.x=-.0093;if(S.v<0)S.v*=-.15}S.T+=(S.I*S.I*Rs/.36-.05*(S.T-22))*e}
- if(S.T>=150){S.cut=true;S.latch=false;S.hold=false;$('latch').setAttribute('aria-pressed','false');h.classList.remove('on')}if(S.cut&&S.T<=60)S.cut=false}
+function phys(dt){
+ const on=(S.hold||S.latch)&&!S.cut;
+ const Rs=.28*(1+.0039*(S.T-20)),r=.15*S.n+.12;
+ S.I=on?1.5*S.n/(Rs+r):0;
+ S.F=S.B*S.I*.02*S.pol*(S.flip?-1:1);
+ let remaining=dt*S.ts;
+ S.t+=remaining;
+ while(remaining>0){
+  const step=Math.min(.0004,remaining);
+  remaining-=step;
+  S.v+=(S.F-1.5*S.x-.00588*S.v)/4e-4*step;
+  S.x+=S.v*step;
+  if(S.x<-.0093){S.x=-.0093;if(S.v<0)S.v*=-.15}
+  S.T+=(S.I*S.I*Rs/.36-.05*(S.T-22))*step;
+ }
+ if(S.T>=150){
+  S.T=150;
+  S.cut=true;S.latch=false;S.hold=false;
+  S.I=0;S.F=0;
+  $('latch').setAttribute('aria-pressed','false');
+  $('hold').classList.remove('on');
+ }
+ if(S.cut&&S.T<=60)S.cut=false;
+}
 const fm=(v,d)=>((Math.abs(v)<0.0005)?0:v).toFixed(d).replace('.',',');
-function frame(dt){phys(dt);const dv=Math.max(-3,Math.min(14,S.x*300)),on=(S.hold||S.latch)&&!S.cut,sg2=S.F>=0?1:-1;bend(dv);
+function frame(dt){phys(dt);$('hold').disabled=S.cut;$('latch').disabled=S.cut;const dv=Math.max(-3,Math.min(14,S.x*300)),on=(S.hold||S.latch)&&!S.cut,sg2=S.F>=0?1:-1;bend(dv);
  const hot=Math.max(0,Math.min(1,(S.T-100)/250));mat.strip.emissive.setRGB(hot,hot*.3,hot*.08);
  S.ph+=S.pol*(4+8*S.I)*dt;pts.visible=on;for(let i=0;i<NP;i++){const p=at(i/NP*L+S.ph,dv+.2);pp[i*3]=p[0];pp[i*3+1]=p[1];pp[i*3+2]=p[2]}pg.attributes.position.needsUpdate=true;
  const v=S.vec;aB.visible=v;aB.position.set(23.3,6.5,S.flip?7.8:21.8);aB.setDirection(new V3(0,0,S.flip?1:-1));aB.setLength(13.8,2,1.3);
