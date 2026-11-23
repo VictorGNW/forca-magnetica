@@ -23,17 +23,9 @@ const labels=[['Ponto positivo',tP,'positive'],['Ponto negativo',tN,'negative']]
  $('stage').appendChild(el);mesh.visible=false;
  return {mesh,center,el};
 });
-const labelWorld=new THREE.Vector3();
-function updateTerminalLabels(){
- const rect=$('stage').getBoundingClientRect();
- for(const {mesh,center,el} of labels){
-  mesh.updateWorldMatrix(true,false);
-  labelWorld.copy(center).applyMatrix4(mesh.matrixWorld).project(cam);
-  const visible=labelWorld.z>=-1&&labelWorld.z<=1&&Math.abs(labelWorld.x)<=1.15&&Math.abs(labelWorld.y)<=1.15;
-  el.style.display=visible?'block':'none';
-  if(visible){el.style.left=((labelWorld.x+1)*.5*rect.width)+'px';el.style.top=((-labelWorld.y+1)*.5*rect.height)+'px'}
- }
-}
+// As etiquetas são uma legenda 2D fixa: não desaparecem ao girar a câmera.
+function updateTerminalLabels(){}
+
 mk('txtCampo',mat.txt,ann);mk('txtCorr',mat.txt,ann);mk('txtForca',mat.txt,ann);mk('xmarks',mat.xm,ann);mk('arrB',mat.aB,ann);mk('arrI',mat.aI,ann);
 const sg=new THREE.BoxGeometry(35,1.4,.8,80,1,1),sp=sg.attributes.position,s0=sp.array.slice(),strip=new THREE.Mesh(sg,mat.strip);strip.position.set(23.3,3.5,14.2);root.add(strip);
 const shape=x=>.5*(1+Math.cos(Math.PI*Math.max(-1,Math.min(1,x/17.5))));
