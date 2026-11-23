@@ -23,8 +23,26 @@ const labels=[['Ponto positivo',tP,'positive'],['Ponto negativo',tN,'negative']]
  $('stage').appendChild(el);mesh.visible=false;
  return {mesh,center,el};
 });
-// As etiquetas são uma legenda 2D fixa: não desaparecem ao girar a câmera.
-function updateTerminalLabels(){}
+// Etiquetas HTML 2D ancoradas aos fios no espaço 3D, atualizadas com a câmera.
+const terminalAnchorLeft=new THREE.Vector3(6.65,2.8,25);
+const terminalAnchorRight=new THREE.Vector3(38.55,2.8,25);
+const projectedTerminal=new THREE.Vector3();
+function updateTerminalLabels(){
+ const stage=$('stage'),width=stage.clientWidth,height=stage.clientHeight;
+ if(!width||!height)return;
+ for(const {el} of labels){
+  const positive=el.classList.contains('positive');
+  const anchor=(positive===(S.pol>0))?terminalAnchorLeft:terminalAnchorRight;
+  projectedTerminal.copy(anchor).project(cam);
+  // Mantém a etiqueta junto ao fio, inclusive ao girar a cena.
+  const x=(projectedTerminal.x+1)*width/2;
+  const y=(1-projectedTerminal.y)*height/2;
+  const margin=el.offsetWidth/2+5;
+  el.style.left=Math.max(margin,Math.min(width-margin,x))+'px';
+  el.style.top=Math.max(12,Math.min(height-12,y))+'px';
+  el.style.display=projectedTerminal.z>=-1&&projectedTerminal.z<=1?'block':'none';
+ }
+}
 
 mk('txtCampo',mat.txt,ann);mk('txtCorr',mat.txt,ann);mk('txtForca',mat.txt,ann);mk('xmarks',mat.xm,ann);mk('arrB',mat.aB,ann);mk('arrI',mat.aI,ann);
 const sg=new THREE.BoxGeometry(35,1.4,.8,80,1,1),sp=sg.attributes.position,s0=sp.array.slice(),strip=new THREE.Mesh(sg,mat.strip);strip.position.set(23.3,3.5,14.2);root.add(strip);
