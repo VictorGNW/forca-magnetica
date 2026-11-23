@@ -5,12 +5,12 @@ const q=new Uint16Array(b64(D.v)),pos=new Float32Array(q.length),mn=D.mn,mx=D.mx
 for(let i=0;i<q.length;i+=3){const k=[0,1,2].map(j=>mn[j]+q[i+j]/65535*(mx[j]-mn[j]));pos[i]=k[0];pos[i+1]=k[2];pos[i+2]=-k[1]}
 const PA=new THREE.BufferAttribute(pos,3);
 const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:.05,flatShading:true},o));
-const mat={book:M(0x8b9099),magS:M(0x3c6fc4),magN:M(0xc5443c),lt:M(0xf4f4f4),clip:M(0x7a828c,{metalness:.5,roughness:.35}),wL:M(0xc0392b),wR:M(0x30343b),pil:M(0xd9a21b),txt:M(0x2b3140),tP:M(0xc0392b),tN:M(0x30343b),xm:M(0x2f6fd6),aB:M(0x2f9e6f),aI:M(0xe6b422),strip:M(0xd6d9de,{metalness:.35,roughness:.3})};
-const cv=$('cv'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(35,1,.5,600);
-scene.add(new THREE.HemisphereLight(0xffffff,0x8890a0,.95));const dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(30,70,60);scene.add(dl);
-const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=true;ctl.target.set(22.7,2.5,19);ctl.maxPolarAngle=1.52;ctl.minDistance=25;ctl.maxDistance=180;
-const plane=new THREE.Mesh(new THREE.PlaneGeometry(80,64),new THREE.MeshStandardMaterial({color:0xe4e1d8,roughness:1}));plane.rotation.x=-Math.PI/2;plane.position.set(22.7,-.06,19);scene.add(plane);
+const mat={book:M(0x9aa8b9,{roughness:.82}),magS:M(0x3271bd,{metalness:.14,roughness:.36}),magN:M(0xc84950,{metalness:.14,roughness:.36}),lt:M(0xf5f8ff),clip:M(0x728399,{metalness:.64,roughness:.34}),wL:M(0xe05f59),wR:M(0x8a9eb6),pil:M(0xf0bc48,{metalness:.23}),txt:M(0xf1f5fa),tP:M(0xe05f59),tN:M(0x8a9eb6),xm:M(0x65a8ff),aB:M(0x60a5fa),aI:M(0xf2be4c),strip:M(0xd7e3ed,{metalness:.7,roughness:.24})};
+const cv=$('cv'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,1.75));R.outputEncoding=THREE.sRGBEncoding;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.2;
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(35,1,.5,600);scene.background=new THREE.Color(0x0e1a2c);
+scene.add(new THREE.HemisphereLight(0xe6f3ff,0x31445f,1.4));const dl=new THREE.DirectionalLight(0xffffff,1.25);dl.position.set(20,75,65);scene.add(dl);const fill=new THREE.DirectionalLight(0x9ecbff,.45);fill.position.set(-40,30,-25);scene.add(fill);
+const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=!matchMedia('(prefers-reduced-motion: reduce)').matches;ctl.dampingFactor=.08;ctl.enablePan=false;ctl.target.set(22.7,2.5,19);ctl.maxPolarAngle=1.52;ctl.minPolarAngle=.13;ctl.minDistance=28;ctl.maxDistance=155;
+const plane=new THREE.Mesh(new THREE.PlaneGeometry(80,64),new THREE.MeshStandardMaterial({color:0x223149,roughness:1}));plane.rotation.x=-Math.PI/2;plane.position.set(22.7,-.06,19);scene.add(plane);const grid=new THREE.GridHelper(80,16,0x51718c,0x334b65);grid.position.set(22.7,-.038,19);grid.material.transparent=true;grid.material.opacity=.14;scene.add(grid);
 const root=new THREE.Group(),ann=new THREE.Group();scene.add(root,ann);ann.visible=false;
 const mk=(n,m,p)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',PA);g.setIndex(new THREE.BufferAttribute(new Uint16Array(b64(D.g[n])),1));const o=new THREE.Mesh(g,m);(p||root).add(o);return o};
 mk('book',mat.book);const mT=mk('magTop',mat.magS),mB=mk('magBot',mat.magN),lT=mk('letTop',mat.lt),lB=mk('letBot',mat.lt);
@@ -34,13 +34,15 @@ function updateTerminalLabels(){
   const positive=el.classList.contains('positive');
   const anchor=(positive===(S.pol>0))?terminalAnchorLeft:terminalAnchorRight;
   projectedTerminal.copy(anchor).project(cam);
-  // Mantém a etiqueta junto ao fio, inclusive ao girar a cena.
   const x=(projectedTerminal.x+1)*width/2;
   const y=(1-projectedTerminal.y)*height/2;
-  const margin=el.offsetWidth/2+5;
-  el.style.left=Math.max(margin,Math.min(width-margin,x))+'px';
-  el.style.top=Math.max(14,Math.min(height-14,y))+'px';
-  el.style.display=projectedTerminal.z>=-1&&projectedTerminal.z<=1?'block':'none';
+  const margin=Math.max(36,el.offsetWidth/2+6);
+  const inside=projectedTerminal.z>=-1&&projectedTerminal.z<=1&&x>-16&&x<width+16&&y>5&&y<height-5;
+  el.hidden=!inside;
+  if(inside){
+   el.style.left=Math.max(margin,Math.min(width-margin,x))+'px';
+   el.style.top=Math.max(23,Math.min(height-23,y-18))+'px';
+  }
  }
 }
 
@@ -57,14 +59,24 @@ const noteItems=[
 function updateModelNotes(){
  const w=$('stage').clientWidth,h=$('stage').clientHeight;
  if(!w||!h)return;
+ const placed=labels.filter(({el})=>!el.hidden).map(({el})=>({x:parseFloat(el.style.left)||0,y:parseFloat(el.style.top)||0,w:el.offsetWidth,h:el.offsetHeight}));
  for(const item of noteItems){
-  if(!ann.visible){item.el.hidden=true;continue}
+  const el=item.el;
+  if(!ann.visible){el.hidden=true;continue}
   projectedTerminal.copy(item.anchor).project(cam);
-  const x=(projectedTerminal.x+1)*w/2,y=(1-projectedTerminal.y)*h/2;
-  const half=item.el.offsetWidth/2+8;
-  const visible=projectedTerminal.z>=-1&&projectedTerminal.z<=1&&x>=half&&x<=w-half&&y>=42&&y<=h-18;
-  item.el.hidden=!visible;
-  if(visible){item.el.style.left=x+'px';item.el.style.top=y+'px'}
+  const sx=(projectedTerminal.x+1)*w/2,sy=(1-projectedTerminal.y)*h/2;
+  if(projectedTerminal.z< -1||projectedTerminal.z>1||sx<0||sx>w||sy<0||sy>h){el.hidden=true;continue}
+  el.hidden=false;el.style.visibility='hidden';
+  const ew=el.offsetWidth,eh=el.offsetHeight;
+  let picked=null;
+  for(const [ox,oy] of [[0,-32],[0,32],[58,-22],[-58,-22],[55,28],[-55,28]]){
+   const x=sx+ox,y=sy+oy;
+   if(x-ew/2<7||x+ew/2>w-7||y-eh/2<52||y+eh/2>h-9)continue;
+   if(placed.some(p=>Math.abs(p.x-x)<(p.w+ew)/2+9&&Math.abs(p.y-y)<(p.h+eh)/2+8))continue;
+   picked={x,y,w:ew,h:eh};break;
+  }
+  if(!picked){el.hidden=true;continue}
+  el.style.left=picked.x+'px';el.style.top=picked.y+'px';el.style.visibility='visible';placed.push(picked);
  }
 }
 const sg=new THREE.BoxGeometry(35,1.4,.8,80,1,1),sp=sg.attributes.position,s0=sp.array.slice(),strip=new THREE.Mesh(sg,mat.strip);strip.position.set(23.3,3.5,14.2);root.add(strip);
@@ -78,13 +90,13 @@ const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xffd34d,size:1.3}
 const arr=c=>{const a=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),5,c,1.8,1.1);scene.add(a);return a};
 const aB=arr(0x2f6fd6),aI=arr(0xe6a817),aF=arr(0xd3382f),V3=THREE.Vector3;
 const S={n:1,B:.2,ts:.3,flip:false,pol:1,hold:false,latch:false,cut:false,x:0,v:0,T:22,t:0,I:0,F:0,ph:0,vec:true,msg:''};
-const cRed=0xc0392b,cDk=()=>dark()?0x7b8290:0x30343b;
-function paint(){mat.wL.color.setHex(S.pol>0?cRed:cDk());mat.wR.color.setHex(S.pol>0?cDk():cRed);mat.tP.color.setHex(cRed);mat.tN.color.setHex(cDk());mat.txt.color.setHex(dark()?0xd5d9e2:0x2b3140);plane.material.color.setHex(dark()?0x2a2e36:0xe4e1d8)}
+const cRed=0xe05f59,cDk=()=>0x8a9eb6;
+function paint(){mat.wL.color.setHex(S.pol>0?cRed:cDk());mat.wR.color.setHex(S.pol>0?cDk():cRed);mat.tP.color.setHex(cRed);mat.tN.color.setHex(cDk());mat.txt.color.setHex(0xf1f5fa);plane.material.color.setHex(0x223149)}
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paint);paint();
 function phys(dt){const on=(S.hold||S.latch)&&!S.cut,Rs=.28*(1+.0039*(S.T-20)),r=.15*S.n+.12;S.I=on?1.5*S.n/(Rs+r):0;S.F=S.B*S.I*.02*S.pol*(S.flip?-1:1);let h=dt*S.ts;S.t+=h;
  while(h>0){const e=Math.min(.0004,h);h-=e;S.v+=(S.F-1.5*S.x-.00588*S.v)/4e-4*e;S.x+=S.v*e;if(S.x<-.0093){S.x=-.0093;if(S.v<0)S.v*=-.15}S.T+=(S.I*S.I*Rs/.36-.05*(S.T-22))*e}
  if(S.T>=150){S.cut=true;S.latch=false;S.hold=false;$('latch').setAttribute('aria-pressed','false');h.classList.remove('on')}if(S.cut&&S.T<=60)S.cut=false}
-const fm=(v,d)=>v.toFixed(d).replace('.',',');
+const fm=(v,d)=>((Math.abs(v)<0.0005)?0:v).toFixed(d).replace('.',',');
 function frame(dt){phys(dt);const dv=Math.max(-3,Math.min(14,S.x*300)),on=(S.hold||S.latch)&&!S.cut,sg2=S.F>=0?1:-1;bend(dv);
  const hot=Math.max(0,Math.min(1,(S.T-100)/250));mat.strip.emissive.setRGB(hot,hot*.3,hot*.08);
  S.ph+=S.pol*(4+8*S.I)*dt;pts.visible=on;for(let i=0;i<NP;i++){const p=at(i/NP*L+S.ph,dv+.2);pp[i*3]=p[0];pp[i*3+1]=p[1];pp[i*3+2]=p[2]}pg.attributes.position.needsUpdate=true;
@@ -99,9 +111,16 @@ function frame(dt){phys(dt);const dv=Math.max(-3,Math.min(14,S.x*300)),on=(S.hol
  $('hI').textContent=fm(S.I,1)+' A';$('hF').textContent=(S.F>=0?'+':'−')+fm(Math.abs(S.F)*1e3,1)+' mN';$('hD').textContent=fm(S.x*1e3,1)+' mm';$('hT').textContent=Math.round(S.T)+' °C';$('hS').textContent=fm(S.t,1)+' s'}
 let last=performance.now();(function loop(n){const dt=Math.min(.05,(n-last)/1e3);last=n;frame(dt);ctl.update();updateTerminalLabels();updateModelNotes();R.render(scene,cam);requestAnimationFrame(loop)})(last);
 new ResizeObserver(()=>{const s=$('stage');R.setSize(s.clientWidth,s.clientHeight,false);cam.aspect=s.clientWidth/s.clientHeight;cam.updateProjectionMatrix()}).observe($('stage'));
-const view={p:[52,60,84],t:[22.7,120,27],f:[22.7,14,98]};
-document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{cam.position.set(...view[b.dataset.v]);ctl.target.set(22.7,2.5,19);ctl.update()});cam.position.set(...view.p);
-const h=$('hold');h.addEventListener('pointerdown',e=>{if(S.cut)return;S.hold=true;h.classList.add('on');h.setPointerCapture(e.pointerId)});['pointerup','pointercancel'].forEach(t=>h.addEventListener(t,()=>{S.hold=false;h.classList.remove('on')}));
+const view={p:[60,58,89],t:[22.7,120,19.01],f:[22.7,15,105]};
+function setView(which){
+ cam.position.set(...view[which]);ctl.target.set(22.7,2.5,19);ctl.update();
+ document.querySelectorAll('[data-v]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.v===which)));
+}
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+setView('p');
+const h=$('hold');h.addEventListener('pointerdown',e=>{if(S.cut)return;S.hold=true;h.classList.add('on');h.setPointerCapture(e.pointerId)});['pointerup','pointercancel','lostpointercapture'].forEach(t=>h.addEventListener(t,()=>{S.hold=false;h.classList.remove('on')}));
+h.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!S.cut){e.preventDefault();S.hold=true;h.classList.add('on')}});
+h.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();S.hold=false;h.classList.remove('on')}});
 addEventListener('keydown',e=>{if(e.code==='Space'&&!e.repeat&&!['INPUT','BUTTON','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!S.cut){e.preventDefault();S.hold=true;h.classList.add('on')}});
 addEventListener('keyup',e=>{if(e.code==='Space'){S.hold=false;h.classList.remove('on')}});
 addEventListener('blur',()=>{S.hold=false;h.classList.remove('on')});
@@ -109,5 +128,5 @@ const tog=(id,fn)=>$(id).onclick=function(){const o=this.getAttribute('aria-pres
 tog('latch',o=>{if(S.cut){S.latch=false;$('latch').setAttribute('aria-pressed','false');return}S.latch=o});tog('vec',o=>S.vec=o);tog('ann',o=>ann.visible=o);
 $('pol').onclick=()=>{S.pol*=-1;tP.position.x=S.pol>0?0:20.3;tN.position.x=S.pol>0?0:-20.3;paint()};
 $('flip').onclick=()=>{S.flip=!S.flip;mT.material=S.flip?mat.magN:mat.magS;mB.material=S.flip?mat.magS:mat.magN;lT.position.set(S.flip?.35:0,0,S.flip?21.7:0);lB.position.set(S.flip?-.35:0,0,S.flip?-21.7:0)};
-$('reset').onclick=()=>{Object.assign(S,{n:1,B:.2,ts:.3,flip:false,pol:1,hold:false,latch:false,cut:false,x:0,v:0,T:22,t:0,I:0,F:0,ph:0,vec:true,msg:''});for(const [id,val,out,label] of [['n',1,'nO','1'],['b',.2,'bO','0,20 T'],['ts',.3,'tO','0,30×']]){$(id).value=val;$(out).textContent=label}for(const [id,on] of [['latch',false],['vec',true],['ann',false]])$(id).setAttribute('aria-pressed',String(on));ann.visible=false;h.classList.remove('on');mT.material=mat.magS;mB.material=mat.magN;lT.position.set(0,0,0);lB.position.set(0,0,0);tP.position.x=0;tN.position.x=0;paint()};
+$('reset').onclick=()=>{Object.assign(S,{n:1,B:.2,ts:.3,flip:false,pol:1,hold:false,latch:false,cut:false,x:0,v:0,T:22,t:0,I:0,F:0,ph:0,vec:true,msg:''});for(const [id,val,out,label] of [['n',1,'nO','1'],['b',.2,'bO','0,20 T'],['ts',.3,'tO','0,30×']]){$(id).value=val;$(out).textContent=label}for(const [id,on] of [['latch',false],['vec',true],['ann',false]])$(id).setAttribute('aria-pressed',String(on));ann.visible=false;h.classList.remove('on');mT.material=mat.magS;mB.material=mat.magN;lT.position.set(0,0,0);lB.position.set(0,0,0);tP.position.x=0;tN.position.x=0;setView('p');paint()};
 [['n','nO',v=>v],['b','bO',v=>fm(+v,2)+' T'],['ts','tO',v=>fm(+v,2)+'×']].forEach(([i,o,f])=>$(i).oninput=e=>{const v=+e.target.value;$(o).textContent=f(v);S[i==='b'?'B':i]=v});
