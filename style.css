@@ -32,4 +32,4 @@ button[aria-pressed="true"]{border-color:var(--B);box-shadow:inset 0 0 0 1px var
 .terminal-label.negative{border-left:3px solid #aeb8c7}
 
 /* Etiquetas seguem a projeção dos fios, sem ficar presas à tela. */
-#stage .terminal-label{bottom:auto;right:auto;transform:translate(-50%,-50%);max-width:none;white-space:nowrap}
+#stage .terminal-label{bottom:auto!important;right:auto!important;transform:translate(-50%,-50%);max-width:none;white-space:nowrap}
