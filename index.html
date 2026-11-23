@@ -1,32 +1,104 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Experimento: força magnética sobre a tira de alumínio</title>
-<link rel="stylesheet" href="style.css?v=20261123-notes6"></head><body><main>
-<h1>Força magnética sobre a tira de alumínio</h1>
-<p class="sub">Segure o botão para fechar o circuito, como no experimento real. Arraste a cena para girar e use a roda ou dois dedos para aproximar.</p>
-<div id="stage"><canvas id="cv" aria-label="Modelo 3D do experimento: tira de alumínio entre dois ímãs ligada a uma pilha"></canvas>
-<div id="hud"><span>Corrente</span><b id="hI">0,0 A</b><span>Força</span><b id="hF">0,0 mN</b><span>Deslocamento</span><b id="hD">0,0 mm</b><span>Temperatura</span><b id="hT">22 °C</b><span>Tempo</span><b id="hS">0,0 s</b></div></div>
-<div class="row">
-<button class="pri" id="hold">Tocar a ligação (segurar)</button>
-<button id="latch" aria-pressed="false">Manter ligado</button>
-<button id="pol">Inverter pilha</button>
-<button id="flip">Inverter ímãs</button>
-<button id="reset">Reiniciar</button></div>
-<div class="row">
-<button id="vec" aria-pressed="true">Vetores B, i, F</button>
-<button id="ann" aria-pressed="false">Anotações do modelo</button>
-<button data-v="p">Perspectiva</button><button data-v="t">De cima</button><button data-v="f">De frente</button></div>
-<div class="sl">
-<div><label for="n">Pilhas em série <b id="nO">1</b></label><input id="n" type="range" min="1" max="3" step="1" value="1"></div>
-<div><label for="b">Campo dos ímãs <b id="bO">0,20 T</b></label><input id="b" type="range" min="0.05" max="0.5" step="0.01" value="0.2"></div>
-<div><label for="ts">Velocidade do tempo <b id="tO">0,30×</b></label><input id="ts" type="range" min="0.05" max="1" step="0.05" value="0.3"></div></div>
-<p id="status" aria-live="polite"></p>
-<div class="lg"><span><i style="background:var(--B)"></i>B: campo, de N para S</span><span><i style="background:var(--I)"></i>i: corrente</span><span><i style="background:var(--F)"></i>F: força magnética</span></div>
-<p class="note">Valores estimados para uma tira de papel alumínio de uns 10 cm e ímãs com 2 cm de largura de campo. Quanto maior a corrente, mais a tira esquenta. A força segue F = B·i·L, com o sentido dado pela regra da mão direita. Soltar a ligação é parte do experimento: toques de 1 a 2 segundos.</p>
-</main>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Laboratório virtual de Física: explore a força magnética sobre um condutor com uma simulação 3D interativa.">
+  <title>Laboratório Magnético | Simulador 3D</title>
+  <link rel="stylesheet" href="style.css?v=studio-01">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand"><div class="brand-icon" aria-hidden="true">↗</div><div><strong>Laboratório Magnético</strong><small>Simulador interativo de Física</small></div></div>
+    <span class="topbar-tag"><span class="live-dot"></span> Experimento virtual</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">EXPERIMENTO 01 <span class="separator"></span> ELETROMAGNETISMO</div>
+      <h1 id="page-title">A força magnética <span>em movimento.</span></h1>
+      <p>Explore como a corrente e os ímãs alteram a força sobre uma tira condutora. Interaja com o modelo, mude os parâmetros e observe o resultado.</p>
+    </section>
+    <div class="workspace">
+      <section class="viewer-panel" aria-label="Visualização do experimento">
+        <div class="viewer-header">
+          <div><span class="section-kicker">MODELO INTERATIVO</span><h2>Cena 3D</h2></div>
+          <span class="scene-hint">Arraste para girar · Use dois dedos para ampliar</span>
+        </div>
+        <div id="stage">
+          <canvas id="cv" aria-label="Modelo tridimensional da tira condutora entre ímãs e ligada a uma pilha. Arraste para girar a câmera."></canvas>
+          <div class="scene-badge"><span class="live-dot"></span> Visualização ao vivo</div>
+          <div class="scene-corner" aria-hidden="true">3D</div>
+        </div>
+        <div id="hud" class="metrics" aria-label="Dados da simulação">
+          <div class="metric"><span>Corrente</span><strong id="hI">0,0 A</strong></div>
+          <div class="metric"><span>Força</span><strong id="hF">+0,0 mN</strong></div>
+          <div class="metric"><span>Deslocamento</span><strong id="hD">0,0 mm</strong></div>
+          <div class="metric"><span>Temperatura</span><strong id="hT">22 °C</strong></div>
+          <div class="metric"><span>Tempo</span><strong id="hS">0,0 s</strong></div>
+        </div>
+        <div class="viewer-tools">
+          <div class="tool-block">
+            <span class="tool-label">Ângulo da câmera</span>
+            <div class="view-buttons" role="group" aria-label="Ângulo da câmera">
+              <button data-v="p" aria-pressed="true">Perspectiva</button>
+              <button data-v="t" aria-pressed="false">Superior</button>
+              <button data-v="f" aria-pressed="false">Frontal</button>
+            </div>
+          </div>
+          <div class="tool-block">
+            <span class="tool-label">Exibição</span>
+            <div class="display-buttons" role="group" aria-label="Opções de visualização">
+              <button id="vec" aria-pressed="true"><span aria-hidden="true" class="mini-dot vectors"></span> Vetores B, i, F</button>
+              <button id="ann" aria-pressed="false"><span aria-hidden="true" class="mini-dot labels"></span> Etiquetas 2D</button>
+            </div>
+          </div>
+        </div>
+        <div class="legend" aria-label="Legenda das cores">
+          <span><i class="dot blue"></i> Campo B</span>
+          <span><i class="dot yellow"></i> Corrente i</span>
+          <span><i class="dot red"></i> Força F</span>
+        </div>
+      </section>
+      <aside class="control-panel" aria-label="Controles da simulação">
+        <div class="panel-heading"><span class="section-kicker">PAINEL DE CONTROLE</span><h2>Seu experimento</h2><p>Comece tocando a ligação e observe o que acontece.</p></div>
+        <div class="panel-section">
+          <div class="panel-section-heading"><span class="step">01</span><h3>Executar simulação</h3></div>
+          <button class="primary-action" id="hold"> <span class="action-icon" aria-hidden="true">◉</span> Tocar a ligação <small>(segurar)</small></button>
+          <button id="latch" class="secondary-action" aria-pressed="false">Manter ligado <span class="switch-mark" aria-hidden="true"></span></button>
+          <p class="helper">Para um toque rápido, mantenha pressionado. Você também pode usar a tecla Espaço.</p>
+          <p id="status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-heading"><span class="step">02</span><h3>Inverter o sentido</h3></div>
+          <div class="action-grid">
+            <button id="pol"><span class="btn-symbol" aria-hidden="true">⇄</span> Inverter pilha</button>
+            <button id="flip"><span class="btn-symbol" aria-hidden="true">↕</span> Inverter ímãs</button>
+          </div>
+          <p class="helper">Inverter a corrente ou o campo magnético muda o sentido da força.</p>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-heading"><span class="step">03</span><h3>Ajustar parâmetros</h3></div>
+          <div class="sl">
+            <div class="range-control"><label for="n">Pilhas em série <output id="nO" for="n">1</output></label><input id="n" type="range" min="1" max="3" step="1" value="1"></div>
+            <div class="range-control"><label for="b">Campo dos ímãs <output id="bO" for="b">0,20 T</output></label><input id="b" type="range" min="0.05" max="0.5" step="0.01" value="0.2"></div>
+            <div class="range-control"><label for="ts">Velocidade do tempo <output id="tO" for="ts">0,30×</output></label><input id="ts" type="range" min="0.05" max="1" step="0.05" value="0.3"></div>
+          </div>
+        </div>
+        <div class="panel-footer"><button id="reset" class="reset-button">↺ <span>Reiniciar experimento</span></button></div>
+      </aside>
+    </div>
+    <section class="learning-panel">
+      <div><span class="section-kicker">ENTENDA A FÍSICA</span><h2>O que está acontecendo?</h2><p>A corrente elétrica atravessa uma tira condutora. Na presença de um campo magnético, surge uma força perpendicular à corrente e ao campo. É esse efeito que o simulador representa.</p></div>
+      <div class="formula-card"><span>FORÇA SOBRE O CONDUTOR</span><strong>F = B · i · L · sen(θ)</strong><small>O sentido é determinado pela regra da mão direita.</small></div>
+    </section>
+    <footer><span>Projeto escolar · Física · Simulação didática</span><span>Modelo virtual com valores aproximados, não um instrumento de medição.</span></footer>
+  </main>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="model.js"></script>
-<script src="app.js?v=20261123-notes6"></script>
-</body></html>
+<script src="app.js?v=studio-01"></script>
+</body>
+</html>
