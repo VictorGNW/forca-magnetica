@@ -31,6 +31,5 @@ button[aria-pressed="true"]{border-color:var(--B);box-shadow:inset 0 0 0 1px var
 .terminal-label.positive{border-left:3px solid #ef6257}
 .terminal-label.negative{border-left:3px solid #aeb8c7}
 
-/* Legenda dos terminais sempre visível no celular. */
-#stage .terminal-label{top:auto!important;bottom:12px;left:12px!important;transform:none;max-width:calc(50% - 18px);white-space:normal;text-align:center}
-#stage .terminal-label.negative{left:auto!important;right:12px}
+/* Etiquetas seguem a projeção dos fios, sem ficar presas à tela. */
+#stage .terminal-label{bottom:auto;right:auto;transform:translate(-50%,-50%);max-width:none;white-space:nowrap}
